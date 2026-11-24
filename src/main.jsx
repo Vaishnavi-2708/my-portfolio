@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { lazy, Suspense, useId, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import {
@@ -10,8 +10,11 @@ import '@fontsource-variable/manrope/wght.css'
 import '@fontsource-variable/space-grotesk/wght.css'
 import { profile, projects, skills } from './content'
 import CyberHero from './CyberHero'
+import ProjectFlow from './ProjectFlow'
 import { useCyberMotion } from './useCyberMotion'
 import './styles.css'
+
+const SpaceField = lazy(() => import('./CyberScene').then(module => ({ default: module.SpaceField })))
 
 const skillIcons = [BrainCircuit, Network, Activity, Code2, Cloud, ShieldCheck]
 const projectIcons = [BrainCircuit, Fingerprint, Workflow, Activity, Database]
@@ -91,6 +94,7 @@ function ProjectCard({ project, Icon }) {
       <details className="project-details">
         <summary aria-label={'Case study: ' + project.title}>Case study <ChevronDown size={18} aria-hidden="true" /></summary>
         <p>{project.detail}</p>
+        <ProjectFlow id={project.id} title={project.title} />
       </details>
     </article>
   )
@@ -118,11 +122,21 @@ function Experience() {
   )
 }
 
+const featuredSkills = ['Python', 'FastAPI', 'LangGraph', 'CrewAI', 'MCP', 'RAG', 'Graph RAG', 'AWS', 'Microsoft Azure', 'GCP', 'Docker', 'Kubernetes']
+
 function Skills() {
+  const [selected, setSelected] = useState('LangGraph')
+  const current = skills.find(skill => skill.items.includes(selected))
   return (
     <section className="cyber-chapter skills-section" id="skills" data-reveal>
       <div className="shell section">
         <SectionHeading label="Skills">Technical stack</SectionHeading>
+        <div className="tech-console reveal-item">
+          <div className="tech-grid" role="group" aria-label="Featured technologies">
+            {featuredSkills.map(technology => <button key={technology} type="button" aria-pressed={selected === technology} onClick={() => setSelected(technology)}>{technology}</button>)}
+          </div>
+          <p className="tech-readout" aria-live="polite"><strong>{selected}</strong><span>{current.title}</span></p>
+        </div>
         <div className="skills-deck">
           {skills.map(({ title, items }, index) => {
             const Icon = skillIcons[index]
@@ -150,6 +164,13 @@ function About() {
         <div className="about-copy reveal-item">
           <p>I started out building Python applications for pharmaceutical quality teams. I moved into industrial data science and applied machine learning before designing multi-agent systems for clinical review.</p>
           <p>My work spans the path from data ingestion and model evaluation to deployment and observability. I’m particularly interested in how evidence retrieval, explainability, and human approvals help teams use AI in regulated settings.</p>
+          <dl className="profile-counters">
+            <div><dt>Years of experience</dt><dd><span className="sr-only">10+</span><span aria-hidden="true"><span data-count="10">10</span>+</span></dd></div>
+            <div><dt>Roles in career timeline</dt><dd><span className="sr-only">{projects.length}</span><span data-count={projects.length} aria-hidden="true">{projects.length}</span></dd></div>
+          </dl>
+          <ul className="tags profile-expertise" aria-label="Areas of expertise">
+            {['Agentic AI', 'Graph RAG', 'Applied machine learning'].map(item => <li key={item}>{item}</li>)}
+          </ul>
           <section className="education-card" id="education" aria-labelledby="education-title">
             <GraduationCap size={26} aria-hidden="true" />
             <div><p className="eyebrow">Education</p><h3 id="education-title">Bachelor of Engineering in Computer Science</h3><p>KITSW, India</p></div>
@@ -182,7 +203,8 @@ function Contact() {
 
 const architecture = [
   { title: 'Ingest', Icon: Database, text: 'Integrate FHIR, HL7, and claims data with validation and PHI masking.', tools: 'FHIR · HL7 · claims APIs' },
-  { title: 'Retrieve', Icon: Network, text: 'Ground review in patient history, coverage criteria, and clinical evidence.', tools: 'Graph RAG · Neo4j · Pinecone' },
+  { title: 'Retrieve', Icon: Network, text: 'Ground review in patient history, coverage criteria, and clinical evidence.', tools: 'Graph RAG · Neo4j graph database · Pinecone vector database' },
+  { title: 'Tool calls', Icon: Code2, text: 'Model Context Protocol (MCP) provides a common interface for agents to invoke tools.', tools: 'MCP · Tool interoperability' },
   { title: 'Evaluate', Icon: BrainCircuit, text: 'Coordinate clinical workflows and evaluate retrieval quality, faithfulness, and latency.', tools: 'LangGraph · Amazon Bedrock · FastAPI' },
   { title: 'Approve', Icon: ShieldCheck, text: 'Route decisions through human approvals and secure handoffs.', tools: 'Human-in-the-loop · Amazon EKS' },
 ]
@@ -196,12 +218,13 @@ function Architecture() {
         <SectionHeading label="AI Architecture">Clinical review workflow</SectionHeading>
         <div className="architecture-card reveal-item">
           <div className="architecture-stages" role="group" aria-label="Clinical review stages">
+            <span key={active.title} className="architecture-pulse" aria-hidden="true" style={{ '--stage-stop': (selected + .5) / architecture.length * 100 + '%' }} />
             {architecture.map(({ title, Icon }, index) => (
               <button key={title} type="button" aria-pressed={selected === index} onClick={() => setSelected(index)}><Icon size={21} aria-hidden="true" />{title}</button>
             ))}
           </div>
           <div className="architecture-detail" aria-live="polite">
-            <p>{active.text}</p><p>{active.tools}</p>
+            <div key={active.title}><p>{active.text}</p><p>{active.tools}</p></div>
           </div>
         </div>
       </div>
@@ -216,7 +239,11 @@ function Portfolio() {
   const motionRoot = useCyberMotion()
 
   return (
-    <div ref={motionRoot}>
+    <div className="portfolio-world" ref={motionRoot}>
+      <div className="space-backdrop" aria-hidden="true">
+        <div className="space-perspective" />
+        <Suspense fallback={null}><SpaceField /></Suspense>
+      </div>
       <a className="skip-link" href="#main">Skip to content</a>
       <Header />
       <main id="main" tabIndex={-1}>

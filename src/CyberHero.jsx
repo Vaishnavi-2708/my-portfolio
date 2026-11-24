@@ -32,16 +32,23 @@ function CodeWindow() {
   return (
     <figure className="holo-panel code-window">
       <figcaption className="window-bar"><Terminal size={14} aria-hidden="true" /> clinical_workflow.py <span aria-hidden="true">•••</span></figcaption>
-      <div className="code-body">
-        <p className="code-comment"># Clinical review flow</p>
+      {/* The scrollable code region needs a tab stop for keyboard scrolling. */}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <div className="code-body" tabIndex={0} role="region" aria-label="Illustrative Python and LangGraph code">
+        <p className="code-comment"># Clinical review graph</p>
         <pre><code>
-          <span className="code-key">def</span>{' review(case):\n'}
-          {'    evidence = '}<span className="code-call">retrieve</span>{'(case)\n'}
-          {'    context = '}<span className="code-call">evaluate</span>{'(evidence)\n'}
-          {'    '}<span className="code-key">return</span>{' '}<span className="code-call">request_approval</span>{'(context)'}
+          <span className="code-key">from</span>{' langgraph.graph '}<span className="code-key">import</span>{' StateGraph\n'}
+          {'\ngraph = '}<span className="code-call">StateGraph</span>{'(ReviewState)\n'}
+          {'graph.add_node("retrieve", retrieve)\n'}
+          {'graph.add_node("review", review)\n'}
+          {'graph.set_entry_point("retrieve")\n'}
+          {'graph.add_edge("retrieve", "review")\n'}
+          {'graph.set_finish_point("review")\n'}
+          {'workflow = graph.compile(\n'}
+          {'    interrupt_before=["review"]\n)'}
         </code></pre>
       </div>
-      <p className="code-caption">Illustrative workflow</p>
+      <p className="code-caption">Illustrative LangGraph excerpt</p>
     </figure>
   )
 }
@@ -75,6 +82,7 @@ export default function CyberHero({ resetFilter }) {
         <div className="hero-copy">
           <p className="eyebrow"><span />{profile.title}</p>
           <h1>{profile.name}</h1>
+          <p className="hero-experience">10+ years of experience</p>
           <p className="hero-intro">I build AI systems that help people review evidence, assess risk, and make decisions across healthcare, finance, and public services.</p>
           <div className="hero-actions">
             <a className="button button-primary" href="#work" onClick={resetFilter}>Explore my work <ArrowDown size={17} aria-hidden="true" /></a>

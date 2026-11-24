@@ -136,3 +136,106 @@ export default function CyberScene() {
 
   return <div className="brain-scene" ref={host} aria-hidden="true"><div className="brain-fallback" /></div>
 }
+
+const backdropNodes = [
+  [-7, 3, -3], [-5, 6, -4], [-4, 1, -2], [-3, 4, -6], [-7, -1, -5],
+  [7, 3, -4], [5, 6, -6], [4, 1, -3], [3, 4, -5], [7, -2, -4],
+]
+const connections = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 3], [2, 3], [2, 4], [5, 6], [5, 7], [5, 9], [6, 8], [7, 8], [7, 9], [5, 8]]
+
+export function SpaceField() {
+  const host = useRef(null)
+
+  useEffect(() => {
+    const node = host.current
+    const canvas = document.createElement('canvas')
+    const context = canvas.getContext('webgl2', { alpha: true, antialias: false })
+    if (!context) return
+    let renderer
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, context, alpha: true, antialias: false })
+    } catch {
+      return
+    }
+
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(55, 1, .1, 80)
+    camera.position.z = 13
+    const world = new THREE.Group()
+    scene.add(world)
+    const random = THREE.MathUtils.seededRandom
+    random(137)
+    const stars = Array.from({ length: 520 }, () => new THREE.Vector3((random() - .5) * 55, (random() - .5) * 42, (random() - 1) * 44))
+    const starGeometry = new THREE.BufferGeometry().setFromPoints(stars)
+    const starMaterial = new THREE.PointsMaterial({ color: '#a6ddff', size: .055, transparent: true, opacity: .72 })
+    world.add(new THREE.Points(starGeometry, starMaterial))
+
+    const cyan = new THREE.Color('#65efff')
+    const violet = new THREE.Color('#bb80ff')
+    const colors = backdropNodes.flatMap((_, index) => (index < 5 ? cyan : violet).toArray())
+    const points = new THREE.BufferGeometry()
+    points.setAttribute('position', new THREE.Float32BufferAttribute(backdropNodes.flat(), 3))
+    points.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
+    const nodeMaterial = new THREE.PointsMaterial({ vertexColors: true, size: .17, transparent: true, opacity: .85 })
+    const wires = new THREE.BufferGeometry()
+    wires.setAttribute('position', new THREE.Float32BufferAttribute(connections.flatMap(([a, b]) => [...backdropNodes[a], ...backdropNodes[b]]), 3))
+    wires.setAttribute('color', new THREE.Float32BufferAttribute(connections.flatMap(([a, b]) => [...colors.slice(a * 3, a * 3 + 3), ...colors.slice(b * 3, b * 3 + 3)]), 3))
+    const wireMaterial = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: .48 })
+    world.add(new THREE.Points(points, nodeMaterial), new THREE.LineSegments(wires, wireMaterial))
+
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25))
+    node.append(canvas)
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)')
+    let frame
+    let last = 0
+    let offsetX = 0
+    let offsetY = 0
+    function draw(time) {
+      if (!reduced.matches && time - last < 32 && time !== 0) {
+        frame = requestAnimationFrame(draw)
+        return
+      }
+      last = time
+      const progress = reduced.matches ? 0 : scrollY / Math.max(innerHeight, 1)
+      world.rotation.y = reduced.matches ? 0 : offsetX * .055 + Math.sin(time / 6200) * .035
+      world.rotation.x = reduced.matches ? 0 : offsetY * .045
+      world.position.y = Math.sin(progress * .55) * .7
+      nodeMaterial.opacity = .83 + Math.sin(time / 740) * .14
+      renderer.render(scene, camera)
+      if (!reduced.matches && !document.hidden) frame = requestAnimationFrame(draw)
+    }
+    function refresh() {
+      cancelAnimationFrame(frame)
+      draw(0)
+    }
+    function resize() {
+      const { clientWidth, clientHeight } = node
+      camera.aspect = clientWidth / Math.max(clientHeight, 1)
+      camera.updateProjectionMatrix()
+      renderer.setSize(clientWidth, clientHeight, false)
+      refresh()
+    }
+    function move(event) {
+      offsetX = event.clientX / innerWidth - .5
+      offsetY = event.clientY / innerHeight - .5
+    }
+    const observer = new ResizeObserver(resize)
+    observer.observe(node)
+    window.addEventListener('pointermove', move, { passive: true })
+    document.addEventListener('visibilitychange', refresh)
+    reduced.addEventListener('change', refresh)
+    resize()
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
+      window.removeEventListener('pointermove', move)
+      document.removeEventListener('visibilitychange', refresh)
+      reduced.removeEventListener('change', refresh)
+      for (const resource of [starGeometry, starMaterial, points, nodeMaterial, wires, wireMaterial]) resource.dispose()
+      renderer.dispose()
+      canvas.remove()
+    }
+  }, [])
+
+  return <div className="space-webgl" ref={host} />
+}

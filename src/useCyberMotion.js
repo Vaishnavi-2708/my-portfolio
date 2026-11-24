@@ -22,6 +22,20 @@ export function useCyberMotion() {
           clearProps: 'transform,opacity',
         })
       }
+      const counters = [...container.querySelectorAll('[data-count]')]
+      for (const counter of counters) {
+        const value = { count: 0 }
+        gsap.to(value, {
+          count: Number(counter.dataset.count),
+          duration: .7,
+          snap: { count: 1 },
+          onUpdate: () => { counter.textContent = value.count },
+          scrollTrigger: { trigger: counter, start: 'top 95%', once: true },
+        })
+      }
+      return () => {
+        for (const counter of counters) counter.textContent = counter.dataset.count
+      }
     }, container)
     media.add('(prefers-reduced-motion: no-preference) and (pointer: fine) and (min-width: 900px)', () => {
       const hero = container.querySelector('.hero')
@@ -41,11 +55,34 @@ export function useCyberMotion() {
         deckY(y * 16)
       }
       function reset() { frameX(0); frameY(0); deckX(0); deckY(0) }
+      const cards = [...container.querySelectorAll('.project-card, .skill-card, .timeline-panel')]
+      function tilt(event) {
+        const card = event.currentTarget
+        const bounds = card.getBoundingClientRect()
+        const x = (event.clientX - bounds.left) / bounds.width - .5
+        const y = (event.clientY - bounds.top) / bounds.height - .5
+        card.style.setProperty('--tilt-x', -y * 6 + 'deg')
+        card.style.setProperty('--tilt-y', x * 6 + 'deg')
+      }
+      function resetTilt(event) {
+        const card = event.currentTarget
+        card.style.removeProperty('--tilt-x')
+        card.style.removeProperty('--tilt-y')
+      }
+      for (const card of cards) {
+        card.addEventListener('pointermove', tilt)
+        card.addEventListener('pointerleave', resetTilt)
+      }
       hero.addEventListener('pointermove', move)
       hero.addEventListener('pointerleave', reset)
       return () => {
         hero.removeEventListener('pointermove', move)
         hero.removeEventListener('pointerleave', reset)
+        for (const card of cards) {
+          card.removeEventListener('pointermove', tilt)
+          card.removeEventListener('pointerleave', resetTilt)
+          resetTilt({ currentTarget: card })
+        }
       }
     }, container)
     return () => media.revert()

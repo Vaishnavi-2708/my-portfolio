@@ -355,3 +355,77 @@ footer { background: #080f20; }
   .project-card:hover, .skill-card:hover, .contact-deck a:hover { translate: 0 -.25rem; box-shadow: 0 0 1rem var(--ray); }
   .project-card:hover .art-core, .about-art:hover .art-core { rotate: 0deg; }
 }
+
+.portfolio-world { position: relative; isolation: isolate; }
+.space-backdrop { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 0 33%, #153858, transparent 50%), radial-gradient(ellipse at 100% 30%, #2b1b57, transparent 53%), #050916; }
+.space-backdrop::before { position: absolute; inset: 0; content: ''; background: radial-gradient(circle at 13px 8px, #d8faff 0 1px, transparent 1.6px), radial-gradient(circle at 22px 30px, #b693ff 0 .7px, transparent 1.35px); background-size: 83px 91px, 117px 139px; opacity: .45; }
+.space-webgl, .space-webgl canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.space-perspective { position: absolute; inset: 21% -24% -22%; background: repeating-linear-gradient(90deg, #70e4ff29 0 1px, transparent 1px 80px), repeating-linear-gradient(0deg, #70e4ff29 0 1px, transparent 1px 69px); transform: perspective(450px) rotateX(51deg); transform-origin: center bottom; mask-image: linear-gradient(transparent 5%, #000 84%); }
+.hero { background: radial-gradient(ellipse at 55% 37%, #050b1aed, #090e21a8 65%, #05091658); }
+.cyber-chapter { background: radial-gradient(ellipse at var(--glow-x, 18%) 28%, var(--chapter-glow), transparent 59%), linear-gradient(125deg, #060d1ebe, #07122488 51%, #120b24a3); }
+.cyber-chapter::before { opacity: .72; }
+:root[data-theme="light"] .cyber-chapter:not(.contact-section) { background: radial-gradient(ellipse at var(--glow-x, 18%) 28%, #c2d8fcb3, transparent 65%), #eef6fff2; }
+.cyber-chapter .shell { position: relative; }
+.cyber-chapter .shell::before { position: absolute; inset: 2rem -.35rem; z-index: -1; content: ''; pointer-events: none; border: 1px solid var(--rim); border-radius: 1rem; box-shadow: 0 0 1.1rem var(--ray), inset 0 0 1.3rem #6dbdff17; transform: perspective(1600px) rotateX(1.6deg) rotateY(-3deg) rotateZ(-.35deg); opacity: .55; }
+.cyber-chapter:nth-child(even) .shell::before { transform: perspective(1600px) rotateX(-1.3deg) rotateY(2.8deg) rotateZ(.35deg); }
+.hero-experience { margin-bottom: .5rem; color: var(--accent); font: 700 .78rem/1.5 var(--mono); }
+.code-body { max-height: 10.1rem; }
+.code-body:focus-visible { outline-offset: -2px; }
+.about-copy, .timeline-panel, .skill-card, .project-card, .architecture-card, .contact-console {
+  background: linear-gradient(128deg, #1f4160d9, #0b172cda 54%, #251943da);
+}
+:root[data-theme="light"] :is(.about-copy, .timeline-panel, .skill-card, .project-card, .architecture-card) { background: var(--glass); }
+.profile-counters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; margin-block: 1.15rem .3rem; }
+.profile-counters div { display: flex; flex-direction: column-reverse; gap: .35rem; padding: .72rem; border: 1px solid var(--rim); border-radius: .48rem; background: color-mix(in srgb, var(--chapter-base) 77%, transparent); }
+.profile-counters dt { color: var(--muted); font-size: .74rem; font-weight: 800; }
+.profile-counters dd { color: var(--accent); font: 750 clamp(1.55rem, 4vw, 2.35rem)/1 var(--display); font-variant-numeric: tabular-nums; }
+.profile-expertise { padding-bottom: 0; }
+.tech-console { margin-bottom: 1rem; padding: clamp(.75rem, 2vw, 1.25rem); border: 1px solid var(--rim); border-radius: .65rem; background: var(--glass); box-shadow: 0 0 1.25rem var(--ray); }
+.tech-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .5rem; }
+.tech-grid button, .flow-step button { min-height: 2.45rem; padding: .3rem .45rem; border: 1px solid var(--rim); border-radius: .4rem; background: var(--chapter-base); color: var(--ink); font-size: .76rem; font-weight: 850; }
+.tech-grid button:hover, .tech-grid button[aria-pressed="true"], .flow-step button:hover, .flow-step button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 .75rem var(--ray); }
+.tech-readout { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .4rem; border-top: 1px solid var(--rim); padding-top: .65rem; margin-top: .7rem; color: var(--muted); font: 700 .78rem var(--mono); }
+.tech-readout strong { color: var(--accent); }
+.project-flow { margin-top: .75rem; padding: .75rem .55rem; border: 1px solid var(--rim); border-radius: .45rem; }
+.project-flow h4 { margin-bottom: .5rem; color: var(--accent); font: 750 .76rem var(--mono); }
+.flow-steps { display: flex; flex-wrap: wrap; gap: .25rem; }
+.flow-step { display: inline-flex; align-items: center; gap: .25rem; }
+.flow-step svg { color: var(--accent); }
+.flow-step button { min-height: 2rem; padding-inline: .35rem; font-size: .66rem; }
+.project-flow .flow-description { padding-top: .5rem; font-size: .77rem; }
+.architecture-stages { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.architecture-stages::before { border-color: var(--accent); box-shadow: 0 0 .65rem var(--ray); }
+@media (max-width: 900px) { .tech-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .cyber-chapter .shell::before { inset: 1.8rem -.45rem; transform: none !important; opacity: .33; }
+  .tech-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .architecture-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .architecture-stages::before { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .architecture-detail > div { animation: flow-enter .3s ease-out both; }
+  .project-details[open] .flow-step svg { animation: flow-signal 1.2s ease-out 2; }
+  .hero-actions .button { transition: translate .2s ease, box-shadow .2s ease; }
+  .hero-actions .button:hover { translate: 0 -.22rem; }
+  @keyframes flow-enter { from { opacity: .68; translate: .35rem 0; } to { opacity: 1; translate: none; } }
+  @keyframes flow-signal { 50% { opacity: .4; translate: .2rem 0; } }
+}
+@media (prefers-reduced-motion: no-preference) and (pointer: fine) and (min-width: 900px) {
+  .project-card, .skill-card, .timeline-panel { transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transition: transform .2s ease-out, translate .25s ease, box-shadow .25s ease; }
+}
+
+.architecture-pulse { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .tech-grid button { transition: transform .2s ease, box-shadow .2s ease; }
+  .tech-grid button:hover { transform: perspective(180px) rotateX(8deg) translateY(-2px); }
+  .architecture-stages button[aria-pressed="true"] svg { animation: agent-activate .45s ease-out; }
+  @keyframes agent-activate { 40% { scale: 1.22; filter: drop-shadow(0 0 .35rem var(--accent)); } }
+}
+@media (min-width: 561px) and (prefers-reduced-motion: no-preference) {
+  .architecture-pulse { display: block; position: absolute; top: calc(50% - 2px); left: 7%; width: 6%; max-width: 2.4rem; height: 4px; border-radius: 100px; background: var(--accent); box-shadow: 0 0 14px var(--accent); animation: agent-signal .65s ease-out both; pointer-events: none; }
+  @keyframes agent-signal {
+    0% { opacity: 0; left: 7%; }
+    25% { opacity: 1; }
+    100% { opacity: 0; left: var(--stage-stop); }
+  }
+}
