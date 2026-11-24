@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
-  ArrowDown, ArrowDownRight, ArrowRight, ArrowUpRight, Activity, BrainCircuit,
+  ArrowDown, ArrowRight, ArrowUpRight, Activity, BrainCircuit,
   BriefcaseBusiness, ChevronDown, Cloud, Code2, Database, Fingerprint, GitFork, GraduationCap,
   Mail, Moon, Network, ShieldCheck, Sun, Workflow,
 } from 'lucide-react'
@@ -32,7 +32,7 @@ function ThemeToggle() {
   function toggleTheme() {
     const nextTheme = dark ? 'light' : 'dark'
     document.documentElement.dataset.theme = nextTheme
-    document.querySelector('meta[name="theme-color"]').content = dark ? '#f7f7ee' : '#101b19'
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#faf7ff' : '#171225'
     try { localStorage.setItem('portfolio-theme', nextTheme) } catch {
       // Theme switching still works when storage is unavailable.
     }
@@ -59,34 +59,55 @@ function Header() {
   )
 }
 
+const workflowSteps = [
+  { title: 'Retrieve evidence', Icon: Database },
+  { title: 'Evaluate context', Icon: BrainCircuit },
+  { title: 'Clinician approval', Icon: ShieldCheck },
+]
+
 function WorkflowPanel() {
+  const [active, setActive] = useState(null)
   return (
-    <div className="workflow-panel">
-      <p className="panel-caption"><span><Workflow size={15} aria-hidden="true" /> Agentic workflow</span><span>Clinical review</span></p>
-      <ol className="workflow-steps">
-        <li><span className="step-icon"><Database size={19} aria-hidden="true" /></span><div><strong>Retrieve evidence</strong><small>Graph RAG · Clinical records</small></div></li>
-        <li><span className="step-icon"><BrainCircuit size={19} aria-hidden="true" /></span><div><strong>Evaluate context</strong><small>LangGraph · Amazon Bedrock</small></div></li>
-        <li><span className="step-icon"><ShieldCheck size={19} aria-hidden="true" /></span><div><strong>Review and approve</strong><small>Human-in-the-loop</small></div></li>
-      </ol>
-      <div className="panel-result"><div><strong>35%</strong><span>less clinical review time</span></div><ArrowDownRight size={32} aria-hidden="true" /></div>
-    </div>
+    <figure className="workflow-panel" aria-label="Illustration of the clinical review workflow">
+      <div className="orbit" aria-hidden="true">
+        <div className="orbit-ring orbit-outer" />
+        <div className="orbit-ring orbit-inner" />
+        <div className="orbit-core"><Workflow aria-hidden="true" /></div>
+        {workflowSteps.map(({ title, Icon }, index) => (
+          <span className={'orbit-node orbit-node-' + index} data-active={active === index} key={title}><Icon aria-hidden="true" /></span>
+        ))}
+      </div>
+      <figcaption>
+        <p className="panel-caption">Clinical intelligence workflow</p>
+        <ol className="workflow-steps">
+          {workflowSteps.map(({ title, Icon }, index) => <li key={title}><button type="button" aria-pressed={active === index} onClick={() => setActive(active === index ? null : index)}><Icon size={16} aria-hidden="true" />{title}</button></li>)}
+        </ol>
+      </figcaption>
+    </figure>
   )
 }
 
 function Hero() {
   return (
     <section id="home" className="hero">
-      <div className="shell hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow"><span />{profile.title}</p>
-          <h1>Vaishnavi<br />Darla<span>.</span></h1>
-          <p className="hero-intro">I build AI systems that help people review evidence, assess risk, and make decisions across healthcare, finance, and public services.</p>
-          <div className="hero-actions">
-            <a className="button button-primary" href="#work">Explore my work <ArrowDown size={17} aria-hidden="true" /></a>
-            <a className="button button-outline" href="#contact">Contact me <ArrowUpRight size={17} aria-hidden="true" /></a>
+      <div className="shell">
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <p className="eyebrow"><span />{profile.title}</p>
+            <h1>Vaishnavi<br /><em>Darla<span>.</span></em></h1>
+            <p className="hero-intro">I build AI systems that help people review evidence, assess risk, and make decisions across healthcare, finance, and public services.</p>
+            <div className="hero-actions">
+              <a className="button button-primary" href="#work">Explore my work <ArrowDown size={17} aria-hidden="true" /></a>
+              <a className="button button-outline" href="#contact">Contact me <ArrowUpRight size={17} aria-hidden="true" /></a>
+            </div>
           </div>
+          <WorkflowPanel />
         </div>
-        <WorkflowPanel />
+        <ul className="impact-strip" aria-label="Selected project outcomes">
+          {projects.filter(project => project.metric).map(({ id, metric, metricLabel }) => (
+            <li key={id}><strong>{metric}</strong><span>{metricLabel}</span></li>
+          ))}
+        </ul>
       </div>
     </section>
   )
