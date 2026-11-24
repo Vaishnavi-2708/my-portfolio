@@ -1,9 +1,9 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
   ArrowDown, ArrowDownRight, ArrowRight, ArrowUpRight, Activity, BrainCircuit,
   BriefcaseBusiness, ChevronDown, Cloud, Code2, Database, Fingerprint, GitFork, GraduationCap,
-  Mail, Network, ShieldCheck, Workflow,
+  Mail, Moon, Network, ShieldCheck, Sun, Workflow,
 } from 'lucide-react'
 import '@fontsource-variable/manrope/wght.css'
 import '@fontsource-variable/space-grotesk/wght.css'
@@ -23,6 +23,25 @@ function SectionHeading({ label, children }) {
   return <div className="section-heading"><p className="eyebrow"><span />{label}</p><h2>{children}</h2></div>
 }
 
+function ThemeToggle() {
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme)
+  const dark = theme === 'dark'
+  const Icon = dark ? Sun : Moon
+  const label = dark ? 'Switch to light theme' : 'Switch to dark theme'
+
+  function toggleTheme() {
+    const nextTheme = dark ? 'light' : 'dark'
+    document.documentElement.dataset.theme = nextTheme
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#f7f7ee' : '#101b19'
+    try { localStorage.setItem('portfolio-theme', nextTheme) } catch {
+      // Theme switching still works when storage is unavailable.
+    }
+    setTheme(nextTheme)
+  }
+
+  return <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={label} title={label}><Icon size={18} aria-hidden="true" /></button>
+}
+
 function Header() {
   return (
     <header className="site-header">
@@ -31,7 +50,10 @@ function Header() {
         <nav aria-label="Main navigation">
           {navigation.map(([id, label]) => <a key={id} href={'#' + id}>{label}</a>)}
         </nav>
-        <a className="header-contact" href="#contact">Get in touch <ArrowUpRight size={16} aria-hidden="true" /></a>
+        <div className="header-actions">
+          <ThemeToggle />
+          <a className="header-contact" href="#contact" aria-label="Get in touch"><span>Get in touch</span><ArrowUpRight size={16} aria-hidden="true" /></a>
+        </div>
       </div>
     </header>
   )

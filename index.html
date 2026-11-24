@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Vaishnavi Darla, Senior Agentic AI Engineer. Explore production AI, agentic workflows, and applied machine learning across healthcare, finance, and public services." />
     <meta name="theme-color" content="#f7f7ee" />
+    <script>
+      (() => {
+        let theme
+        try { theme = localStorage.getItem('portfolio-theme') } catch {}
+        const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#101b19' : '#f7f7ee'
+      })()
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Vaishnavi Darla | Senior Agentic AI Engineer" />
     <meta property="og:description" content="Selected work in agentic AI, clinical intelligence, fraud detection, and applied machine learning." />

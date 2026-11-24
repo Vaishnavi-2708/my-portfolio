@@ -1,6 +1,7 @@
 # Vaishnavi Darla · Portfolio
 
 A static React portfolio for Vaishnavi Darla, Senior Agentic AI Engineer. It includes selected work, a career timeline, technical skills, education, and contact links. The site uses Vite, Tailwind CSS, Lucide, and locally bundled fonts.
+Use the sun or moon button in the header to switch themes. The site starts with your system theme and remembers your selection. Animations follow your reduced-motion preference.
 
 ## Run locally
 
