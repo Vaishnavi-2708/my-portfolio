@@ -1,9 +1,10 @@
 import { useId, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import {
   ArrowDown, ArrowRight, ArrowUpRight, Activity, BrainCircuit,
   BriefcaseBusiness, ChevronDown, Cloud, Code2, Database, Fingerprint, GitFork, GraduationCap,
-  Mail, Moon, Network, ShieldCheck, Sun, Workflow,
+  Mail, Moon, Network, ShieldCheck, Sparkles, Sun, Workflow,
 } from 'lucide-react'
 import '@fontsource-variable/manrope/wght.css'
 import '@fontsource-variable/space-grotesk/wght.css'
@@ -32,7 +33,7 @@ function ThemeToggle() {
   function toggleTheme() {
     const nextTheme = dark ? 'light' : 'dark'
     document.documentElement.dataset.theme = nextTheme
-    document.querySelector('meta[name="theme-color"]').content = dark ? '#faf7ff' : '#171225'
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#fffaf2' : '#192225'
     try { localStorage.setItem('portfolio-theme', nextTheme) } catch {
       // Theme switching still works when storage is unavailable.
     }
@@ -59,55 +60,56 @@ function Header() {
   )
 }
 
-const workflowSteps = [
-  { title: 'Retrieve evidence', Icon: Database },
-  { title: 'Evaluate context', Icon: BrainCircuit },
-  { title: 'Clinician approval', Icon: ShieldCheck },
-]
+function ImpactPlayground({ resetFilter }) {
+  const [selected, setSelected] = useState(0)
+  const featured = projects.slice(0, 3)
+  const active = featured[selected]
 
-function WorkflowPanel() {
-  const [active, setActive] = useState(null)
   return (
-    <figure className="workflow-panel" aria-label="Illustration of the clinical review workflow">
-      <div className="orbit" aria-hidden="true">
-        <div className="orbit-ring orbit-outer" />
-        <div className="orbit-ring orbit-inner" />
-        <div className="orbit-core"><Workflow aria-hidden="true" /></div>
-        {workflowSteps.map(({ title, Icon }, index) => (
-          <span className={'orbit-node orbit-node-' + index} data-active={active === index} key={title}><Icon aria-hidden="true" /></span>
-        ))}
+    <div className="playground">
+      <div className="playground-heading">
+        <Sparkles size={20} aria-hidden="true" />
+        <h2>Explore the impact</h2>
       </div>
-      <figcaption>
-        <p className="panel-caption">Clinical intelligence workflow</p>
-        <ol className="workflow-steps">
-          {workflowSteps.map(({ title, Icon }, index) => <li key={title}><button type="button" aria-pressed={active === index} onClick={() => setActive(active === index ? null : index)}><Icon size={16} aria-hidden="true" />{title}</button></li>)}
-        </ol>
-      </figcaption>
-    </figure>
+      <div className="impact-grid" role="group" aria-label="Choose a project highlight">
+        {featured.map(({ id, sector, metric }, index) => {
+          const Icon = projectIcons[index]
+          return (
+            <button key={id} type="button" className={'impact-tile tile-' + id} aria-pressed={selected === index} onClick={() => setSelected(index)}>
+              <Icon size={22} aria-hidden="true" />
+              <strong>{metric}</strong>
+              <span>{sector}</span>
+            </button>
+          )
+        })}
+      </div>
+      <div className="impact-selection">
+        <div aria-live="polite">
+          <div key={active.id} className="impact-copy">
+            <p>{active.client}</p>
+            <strong>{active.metricLabel}</strong>
+          </div>
+        </div>
+        <a href={'#project-' + active.id} onClick={resetFilter} aria-label={'View ' + active.title}><ArrowDown size={19} aria-hidden="true" /></a>
+      </div>
+    </div>
   )
 }
 
-function Hero() {
+function Hero({ resetFilter }) {
   return (
     <section id="home" className="hero">
-      <div className="shell">
-        <div className="hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow"><span />{profile.title}</p>
-            <h1>Vaishnavi<br /><em>Darla<span>.</span></em></h1>
-            <p className="hero-intro">I build AI systems that help people review evidence, assess risk, and make decisions across healthcare, finance, and public services.</p>
-            <div className="hero-actions">
-              <a className="button button-primary" href="#work">Explore my work <ArrowDown size={17} aria-hidden="true" /></a>
-              <a className="button button-outline" href="#contact">Contact me <ArrowUpRight size={17} aria-hidden="true" /></a>
-            </div>
+      <div className="shell hero-grid">
+        <div className="hero-copy">
+          <p className="eyebrow"><span />{profile.title}</p>
+          <h1>Vaishnavi<br /><em>Darla<span>.</span></em></h1>
+          <p className="hero-intro">I build AI systems that help people review evidence, assess risk, and make decisions across healthcare, finance, and public services.</p>
+          <div className="hero-actions">
+            <a className="button button-primary" href="#work" onClick={resetFilter}>Explore my work <ArrowDown size={17} aria-hidden="true" /></a>
+            <a className="button button-outline" href="#contact">Contact me <ArrowUpRight size={17} aria-hidden="true" /></a>
           </div>
-          <WorkflowPanel />
         </div>
-        <ul className="impact-strip" aria-label="Selected project outcomes">
-          {projects.filter(project => project.metric).map(({ id, metric, metricLabel }) => (
-            <li key={id}><strong>{metric}</strong><span>{metricLabel}</span></li>
-          ))}
-        </ul>
+        <ImpactPlayground resetFilter={resetFilter} />
       </div>
     </section>
   )
@@ -116,7 +118,7 @@ function Hero() {
 function ProjectCard({ project, Icon }) {
   const headingId = useId()
   return (
-    <article className={'project-card project-' + project.id} aria-labelledby={headingId}>
+    <article id={'project-' + project.id} className={'project-card project-' + project.id} aria-labelledby={headingId}>
       <div className="project-top">
         <span className="project-icon"><Icon size={22} aria-hidden="true" /></span>
         <p>{project.client} <span>·</span> {project.sector}</p>
@@ -201,17 +203,29 @@ function Contact() {
   )
 }
 
+const filters = ['All', ...projects.map(project => project.sector)]
+
 function Portfolio() {
+  const [filter, setFilter] = useState('All')
+
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
       <Header />
       <main id="main" tabIndex={-1}>
-        <Hero />
+        <Hero resetFilter={() => flushSync(() => setFilter('All'))} />
         <section className="shell section" id="work">
           <SectionHeading label="Portfolio">Selected work</SectionHeading>
-          <div className="project-grid grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-            {projects.map((project, index) => <ProjectCard key={project.id} project={project} Icon={projectIcons[index]} />)}
+          <div className="project-filters" role="group" aria-label="Filter projects by industry">
+            {filters.map(value => <button type="button" key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{value}</button>)}
+          </div>
+          <p className="sr-only" role="status">{filter === 'All' ? 'Showing all five projects' : 'Showing one project in ' + filter}</p>
+          <div className="project-grid grid gap-4 md:grid-cols-2 lg:grid-cols-6" data-filtered={filter !== 'All'}>
+            {projects.map((project, index) => (
+              <div className="project-slot" hidden={filter !== 'All' && filter !== project.sector} key={project.id}>
+                <ProjectCard project={project} Icon={projectIcons[index]} />
+              </div>
+            ))}
           </div>
         </section>
         <Experience />
