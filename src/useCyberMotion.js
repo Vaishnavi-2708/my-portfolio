@@ -12,14 +12,13 @@ export function useCyberMotion() {
     const media = gsap.matchMedia()
     media.add('(prefers-reduced-motion: no-preference)', () => {
       gsap.from('.hero-copy, .holo-panel', { y: 24, opacity: 0, stagger: .08, duration: .75, ease: 'power3.out', clearProps: 'transform,opacity' })
-      for (const section of container.querySelectorAll('[data-reveal]')) {
-        gsap.from(section.querySelectorAll('.section-heading, .reveal-item'), {
+      for (const item of container.querySelectorAll('[data-reveal] :is(.section-heading, .reveal-item)')) {
+        gsap.from(item, {
           y: 22,
           opacity: .68,
-          duration: .6,
-          stagger: .065,
+          duration: .58,
           ease: 'power2.out',
-          scrollTrigger: { trigger: section, start: 'top 87%', once: true },
+          scrollTrigger: { trigger: item, start: 'top 94%', once: true },
           clearProps: 'transform,opacity',
         })
       }
