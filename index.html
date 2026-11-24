@@ -4,14 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Vaishnavi Darla, Senior Agentic AI Engineer. Explore production AI, agentic workflows, and applied machine learning across healthcare, finance, and public services." />
-    <meta name="theme-color" content="#fffaf2" />
+    <meta name="theme-color" content="#060b17" />
     <script>
       (() => {
         let theme
         try { theme = localStorage.getItem('portfolio-theme') } catch {}
-        const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        const dark = theme !== 'light'
         document.documentElement.dataset.theme = dark ? 'dark' : 'light'
-        document.querySelector('meta[name="theme-color"]').content = dark ? '#192225' : '#fffaf2'
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#060b17' : '#eef6ff'
       })()
     </script>
     <meta property="og:type" content="website" />
